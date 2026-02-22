@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>物流管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .nav-bar {
+            background-color: #007AFF;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        /* 继承原有的表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+
+        .quantity-control button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #007AFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .quantity-control input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007AFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 30px; /* 增加内边距 */
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 10px; /* 添加圆角 */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .submit_button {
+            padding: 12px 24px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: auto;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit_button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:hover, select:hover {
+            border-color: #007AFF;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: #007AFF;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<nav class="nav-bar">
+    <div class="nav-container">
+        <a href="#" class="nav-brand">电商管理系统</a>
+        <div class="nav-links">
+            <a href="#" class="nav-link" onclick="showContent('logistics')">物流管理</a>
+            <button class="logout-btn" onclick="window.location.href='merchant.html'">退出</button>
+        </div>
+    </div>
+</nav>
+
+<div class="content">
+    <div id="logistics-content">
+        <h2>物流管理</h2>
+        <button class="submit_button" id="add-logistics-btn">添加物流信息</button>
+        <button class="submit_button" id="ship-all-btn">一键发货</button> <!-- 添加一键发货按钮 -->
+        <div id="logistics-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>快递单号</th>
+                    <th>物流公司名称</th>
+                    <th>联系电话</th>
+                    <th>物流状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="logistics-table-body"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="logistics-pagination"></div>
+    </div>
+
+    <div id="add-logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>添加物流信息</h2>
+            <form id="add-logistics-form">
+                <!-- 在添加物流信息的模态框中，将订单号输入框改为下拉框 -->
+                <select id="logistics-order-number" required title="订单号为必填项"></select>
+                <input type="text" id="logistics-tracking-number" placeholder="快递单号">
+                <!-- 添加物流公司下拉框 -->
+                <select id="logistics-company" placeholder="物流公司名称" class="form-control"></select>
+                <!-- 自动更新的联系电话输入框 -->
+                <input type="text" id="logistics-contact-number" placeholder="联系电话" readonly>
+                <input type="text" id="logistics-status" value="未发货" readonly> <!-- 将物流状态默认设置为未发货 -->
+
+                <button type="submit" id="add-logistics-submit-btn" class="submit_button">提交</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 获取弹出窗和按钮元素
+    var modal = document.getElementById('add-logistics-modal');
+    var btn = document.getElementById('add-logistics-btn');
+    var closeBtn = document.getElementsByClassName('close')[0];
+    var shipAllBtn = document.getElementById('ship-all-btn'); // 获取一键发货按钮元素
+
+    // 当用户点击按钮时，显示弹出窗
+    btn.onclick = function () {
+        modal.style.display = 'block';
+    }
+
+    // 当用户点击关闭按钮或弹出窗外时，隐藏弹出窗
+    closeBtn.onclick = function () {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // // 处理表单提交事件（弹窗？）
+    // document.getElementById('add-logistics-form').addEventListener('submit', function (event) {
+    //     event.preventDefault();
+    //
+    //     const orderNumber = document.getElementById('logistics-order-number').value;
+    //     const trackingNumber = document.getElementById('logistics-tracking-number').value;
+    //     const company = document.getElementById('logistics-company').value;
+    //     const contactNumber = document.getElementById('logistics-contact-number').value;
+    //     const status = document.getElementById('logistics-status').value;
+    //     console.log({orderNumber, trackingNumber, company, contactNumber, status});  // 打印发送的数据
+    //     fetch('http://127.0.0.1:5001/add_logistics_info', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             orderNumber,
+    //             trackingNumber,
+    //             company,
+    //             contactNumber,
+    //             status
+    //         })
+    //     })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('网络响应异常，状态码：' + response.status);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             console.log(data); // 打印服务器返回的数据
+    //             alert(data.message);
+    //             // 关闭弹窗
+    //             modal.style.display = 'none';
+    //             // 刷新物流信息表格
+    //             refreshLogisticsTable();
+    //             // 清空输入字段的值
+    //             document.getElementById('logistics-order-number').value = '';
+    //             document.getElementById('logistics-tracking-number').value = '';
+    //             document.getElementById('logistics-company').value = '';
+    //             document.getElementById('logistics-contact-number').value = '';
+    //             formSubmitted = false;  // 标记表单已提交
+    //         })
+    //         .catch(error => {
+    //             console.error('Error adding logistics info:', error);
+    //         });
+    // });
+
+    // 获取物流公司下拉框和联系电话输入框
+    var logisticsCompanySelect = document.getElementById('logistics-company');
+    var logisticsContactNumberInput = document.getElementById('logistics-contact-number');
+
+    // 当物流公司下拉框的选项改变时，更新联系电话输入框的内容
+    logisticsCompanySelect.addEventListener('change', function () {
+        // 假设你从服务器获取的物流公司列表包含 name 和 phone 字段
+        var selectedCompany = logisticsCompanySelect.options[logisticsCompanySelect.selectedIndex];
+        logisticsContactNumberInput.value = selectedCompany.getAttribute('data-telephone');
+    });
+
+    // 在页面加载完成后，通过 AJAX 请求获取已支付订单的 orderid，并填充下拉框
+    window.addEventListener('load', function () {
+        fetch('http://127.0.0.1:5001/get_paid_order_ids')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常，状态码：' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // 打印从服务器获取的数据
+                data.forEach(orderId => {
+                    var option = document.createElement('option');
+                    option.value = orderId;
+                    option.textContent = orderId;
+                    document.getElementById('logistics-order-number').appendChild(option);
+                });
+                // 加载完成后，刷新物流信息表格
+                refreshLogisticsTable();
+            })
+            .catch(error => {
+                console.error('Error fetching paid order ids:', error);
+            });
+    });
+    // 为订单号下拉框添加change事件监听器
+    document.getElementById('logistics-order-number').addEventListener('change', function () {
+        generateTrackingNumber(); // 调用生成快递单号的函数
+    });
+    // 处理表单提交事件
+    document.getElementById('add-logistics-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const orderNumber = document.getElementById('logistics-order-number').value;
+        const trackingNumber = document.getElementById('logistics-tracking-number').value;
+        const company = document.getElementById('logistics-company').value;
+        const contactNumber = document.getElementById('logistics-contact-number').value;
+        // 根据订单号从服务器获取订单状态
+        fetch(`http://127.0.0.1:5001/get_order_status?orderId=${orderNumber}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常，状态码：' + response.status);
+                }
+                return response.text();
+            })
+            .then(status => {
+                const orderStatus = status;
+                console.log({orderNumber, trackingNumber, company, contactNumber, status: orderStatus});  // 打印发送的数据
+                fetch('http://127.0.0.1:5001/add_logistics_info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderNumber,
+                        trackingNumber,
+                        company,
+                        contactNumber,
+                        status: orderStatus
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络响应异常，状态码：' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data); // 打印服务器返回的数据
+                        alert(data.message);
+                        // 关闭弹窗
+                        modal.style.display = 'none';
+                        // 刷新物流信息表格
+                        refreshLogisticsTable();
+                        // 从下拉框中移除已添加的订单号
+                        var select = document.getElementById('logistics-order-number');
+                        for (var i = 0; i < select.options.length; i++) {
+                            if (select.options[i].value === orderNumber) {
+                                select.remove(i);
+                                break;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding logistics info:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('Error fetching order status:', error);
+            });
+    });
+
+    // 生成不重复的快递单号
+    function generateTrackingNumber() {
+        fetch('http://127.0.0.1:5001/generate_tracking_number')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常，状态码：' + response.status);
+                }
+                return response.text();
+            })
+            .then(trackingNumber => {
+                document.getElementById('logistics-tracking-number').value = trackingNumber;
+            })
+            .catch(error => {
+                console.error('Error generating tracking number:', error);
+            });
+    }
+
+    // 在 logistics.html 文件中找到一键发货按钮的元素
+    var shipAllBtn = document.getElementById('ship-all-btn');
+
+
+    // 一键发货功能
+    shipAllBtn.onclick = function () {
+        fetch('http://127.0.0.1:5001/ship_all_orders', {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常，状态码：' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                // 刷新物流信息表格
+                refreshLogisticsTable();
+            })
+            .catch(error => {
+                console.error('Error shipping all orders:', error);
+            });
+    }
+
+    // 刷新物流信息表格
+    function refreshLogisticsTable() {
+        fetch('http://127.0.0.1:5001/get_all_logistics_info')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常，状态码：' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const tableBody = document.getElementById('logistics-table-body');
+                tableBody.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${item.orderNumber}</td>
+                            <td>${item.trackingNumber}</td>
+                            <td>${item.company}</td>
+                            <td>${item.contactNumber}</td>
+                            <td>${item.status}</td>
+                            <td>
+    <button class="delete-logistics-btn" style="background-color: #007AFF; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">删除</button>
+</td>`;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error refreshing logistics table:', error);
+            });
+    }
+
+    window.addEventListener('load', function () {
+        var logisticsCompanySelect = document.getElementById('logistics-company');
+        var companies = [
+            {name: '极兔', telephone: '15936584589'},
+            {name: '京东', telephone: '13965844562'},
+            {name: '申通', telephone: '15968475326'},
+            {name: '邮政', telephone: '13965874426'},
+            {name: '圆通', telephone: '13956852549'},
+            {name: '韵达', telephone: '15936587458'},
+            {name: '中通', telephone: '18754996542'}
+        ];
+        companies.forEach(company => {
+            var option = document.createElement('option');
+            option.value = company.name;
+            option.textContent = company.name;
+            option.setAttribute('data-telephone', company.telephone);
+            logisticsCompanySelect.appendChild(option);
+        });
+    });
+
+    document.getElementById('logistics-table-body').addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('delete-logistics-btn')) {
+            // 获取当前行的快递单号
+            var trackNumber = event.target.parentNode.parentNode.querySelector('td:nth-child(2)').textContent;
+            // 发起请求删除物流信息
+            fetch('http://127.0.0.1:5001/delete_logistics_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({trackNumber})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应异常，状态码：' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // 打印服务器返回的数据
+                    alert(data.message);
+                    // 刷新物流信息表格
+                    refreshLogisticsTable();
+                })
+                .catch(error => {
+                    console.error('Error deleting logistics info:', error);
+                });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电商系统 - 管理员界面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+      .nav-bar {
+            background-color: #007AFF;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+      .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+      .nav-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+      .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+      .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+      .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+      .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+      .logout-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 20px;
+        }
+
+      .logout-btn:hover {
+            background-color: #cc0000;
+        }
+
+      .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        #merchant-info, #consumer-info, #order-info {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            max-width: 100%; /* 确保表格不会超过容器的宽度 */
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+      .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+      .pagination button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007AFF;
+            color: white;
+            cursor: pointer;
+        }
+
+      .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+      .view-details-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+       }
+
+      .delete-shop-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+       }
+
+       .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000; /* 确保模态框在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+       .modal-content {
+            background-color: white;
+            margin:1% auto; /* 调整垂直居中的位置，使模态框更靠上 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; /* 增加宽度 */
+            max-width: 800px; /* 限制最大宽度 */
+            height: auto; /* 高度自动调整 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+            border-radius: 10px; /* 添加圆角效果 */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 使内容左端对齐 */
+        }
+
+       .modal-content h2,.modal-content p {
+            width: 100%; /* 使标题和段落宽度一致 */
+            margin: 5px 0; /* 调整上下外边距 */
+            text-align: left; /* 文本左对齐 */
+        }
+
+      .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+       }
+
+      .close:hover,
+      .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+       }
+
+        #merchant-table {
+            overflow-x: auto; /* 添加水平滚动条 */
+        }
+
+        /* 新增样式：将表头单元格合并，并允许内容自动换行 */
+        #merchant-table thead tr th {
+            white-space: nowrap; /* 防止表头内容换行 */
+        }
+
+        /* 确保表格内容可以换行显示 */
+        #merchant-table tbody td {
+            white-space: normal; /* 允许内容自动换行 */
+            word-wrap: break-word; /* 长单词或无法使用断点的URL强制换行 */
+            max-width: 200px; /* 为每个单元格设置最大宽度，根据实际情况调整 */
+            min-width: 80px; /* 根据按钮的宽度调整 */
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">电商系统</a>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" onclick="showContent('merchant')">商家-店铺信息</a>
+                <a href="#" class="nav-link" onclick="showContent('consumer')">消费者信息</a>
+                <a href="#" class="nav-link" onclick="showContent('order')">订单信息</a>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div id="merchant-info">
+            <h2>商家-店铺信息</h2>
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="merchant-search" placeholder="请输入商家姓名" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 200px;">
+                <button class="view-details-btn" onclick="searchMerchants()">查询</button>
+                <button class="view-details-btn" onclick="resetMerchants()">重置</button>
+            </div>
+            <div id="merchant-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商家ID</th>
+                            <th>商家姓名</th>
+                            <th>电话号码</th>
+                            <th>邮箱</th>
+                            <th>店铺号</th>
+                            <th>店铺名称</th>
+                            <th>店铺地址</th>
+                            <th>店铺类型</th>
+                            <th>商家身份证号</th>
+                            <th>营业执照号码</th>
+                            <th>店铺销量</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="merchant-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="merchant-pagination"></div>
+        </div>
+
+        <div id="consumer-info">
+            <h2>消费者信息</h2>
+            <div id="consumer-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>消费者ID</th>
+                            <th>昵称</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>电话号码</th>
+                            <th>邮箱</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consumer-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="consumer-pagination"></div>
+        </div>
+
+        <div id="order-info">
+            <h2>订单信息</h2>
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="order-search" placeholder="请输入支付状态" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 200px;">
+                <button class="view-details-btn" onclick="searchOrders()">查询</button>
+                <button class="view-details-btn" onclick="resetOrders()">重置</button>
+            </div>
+            <div id="order-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>商品名称</th>
+                            <th>总金额</th>
+                            <th>支付状态</th>
+                            <th>订单状态</th>
+                            <th>消费者昵称</th>
+                            <th>商家姓名</th>
+                            <th>店铺名称</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="order-pagination"></div>
+        </div>
+
+        <div id="order-details-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeOrderDetailsModal()">&times;</span>
+                <table id="order-details-table" style="width: 100%; border-collapse: collapse;">
+                    <!-- 表格内容将通过JavaScript动态生成 -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示内容切换
+        function showContent(page) {
+            const merchantInfo = document.getElementById('merchant-info');
+            const consumerInfo = document.getElementById('consumer-info');
+            const orderInfo = document.getElementById('order-info');
+            const merchantLink = document.querySelector('.nav-link:nth-child(1)');
+            const consumerLink = document.querySelector('.nav-link:nth-child(2)');
+            const orderLink = document.querySelector('.nav-link:nth-child(3)');
+
+            if (page === 'merchant') {
+                merchantInfo.style.display = 'block';
+                consumerInfo.style.display = 'none';
+                orderInfo.style.display = 'none';
+                merchantLink.classList.add('active');
+                consumerLink.classList.remove('active');
+                orderLink.classList.remove('active');
+                fetchMerchantShops(); // 确保在显示商家-店铺信息内容时调用 fetchMerchants 函数
+            } else if (page === 'consumer') {
+                merchantInfo.style.display = 'none';
+                consumerInfo.style.display = 'block';
+                orderInfo.style.display = 'none';
+                merchantLink.classList.remove('active');
+                consumerLink.classList.add('active');
+                orderLink.classList.remove('active');
+                fetchConsumers(); // 确保在显示消费者信息内容时调用 fetchConsumers 函数
+            } else {
+                merchantInfo.style.display = 'none';
+                consumerInfo.style.display = 'none';
+                orderInfo.style.display = 'block';
+                merchantLink.classList.remove('active');
+                consumerLink.classList.remove('active');
+                orderLink.classList.add('active');
+                fetchManagerorders(); // 确保在显示订单信息内容时调用 fetchOrders 函数
+            }
+        }
+
+        // 获取商家-店铺信息
+        async function fetchMerchantShops() {
+            try {
+                const response = await fetch('http://127.0.0.1:5001/get_merchantshops', {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    console.error(`HTTP error! status: ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                const tableBody = document.getElementById('merchant-table-body');
+                tableBody.innerHTML = '';
+
+                data.merchants.forEach(merchant => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${merchant.merchantid}</td>
+                        <td>${merchant.merchantname}</td>
+                        <td>${merchant.merchantphone}</td>
+                        <td>${merchant.email}</td>
+                        <td>${merchant.shopid}</td>
+                        <td>${merchant.shopname}</td>
+                        <td>${merchant.shopaddress}</td>
+                        <td>${merchant.shoptype}</td>
+                        <td>${merchant.idcard}</td>
+                        <td>${merchant.licensenumber}</td>
+                        <td>${merchant.sales}</td>
+                        <td>
+                           <button class="delete-shop-btn" onclick="deleteShop('${merchant.shopid}')">删除店铺</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching merchants:', error);
+            }
+        }
+
+        // 删除店铺
+        async function deleteShop(shopId) {
+            const confirmDelete = confirm("您确定要删除该店铺吗？");
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:5001/delete_shop/${shopId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        alert("店铺删除成功");
+                        fetchMerchantShops(); // 刷新商家店铺信息
+                    } else {
+                        alert("删除失败，请重试。");
+                    }
+                } catch (error) {
+                    console.error('Error deleting shop:', error);
+                    alert("删除失败，请重试。");
+                }
+            }
+        }
+
+        // 搜索商家-店铺信息
+        async function searchMerchants() {
+            const searchInput = document.getElementById('merchant-search').value;
+            try {
+                const response = await fetch(`http://127.0.0.1:5001/search_merchant_shops?merchantname=${searchInput}`, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    console.error(`HTTP error! status: ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                const tableBody = document.getElementById('merchant-table-body');
+                tableBody.innerHTML = '';
+
+                data.merchants.forEach(merchant => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                <td>${merchant.merchantid}</td>
+                <td>${merchant.merchantname}</td>
+                <td>${merchant.merchantphone}</td>
+                <td>${merchant.email}</td>
+                <td>${merchant.shopid}</td>
+                <td>${merchant.shopname}</td>
+                <td>${merchant.shopaddress}</td>
+                <td>${merchant.shoptype}</td>
+                <td>${merchant.idcard}</td>
+                <td>${merchant.licensenumber}</td>
+                <td>
+                   <button class="delete-shop-btn" onclick="deleteShop('${merchant.shopid}')">删除店铺</button>
+                </td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error searching merchants:', error);
+            }
+        }
+
+        // 重置商家-店铺信息
+        function resetMerchants() {
+            document.getElementById('merchant-search').value = '';
+            fetchMerchantShops();
+        }
+
+        // 获取消费者信息
+        async function fetchConsumers() {
+            try {
+                const response = await fetch('http://127.0.0.1:5001/get_consumers', {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    console.error(`HTTP error! status: ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                const tableBody = document.getElementById('consumer-table-body');
+                tableBody.innerHTML = '';
+
+                data.consumers.forEach(consumer => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${consumer.consumerid}</td>
+                        <td>${consumer.nickname}</td>
+                        <td>${consumer.name}</td>
+                        <td>${consumer.gender}</td>
+                        <td>${consumer.phone}</td>
+                        <td>${consumer.email}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching consumers:', error);
+            }
+        }
+
+        // 获取订单信息
+        async function fetchManagerorders() {
+            try {
+                const response = await fetch('http://127.0.0.1:5001/get_managerorders', {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    console.error(`HTTP error! status: ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                const tableBody = document.getElementById('order-table-body');
+                tableBody.innerHTML = '';
+
+                data.orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${order.orderid}</td>
+                    <td>${order.productname}</td>
+                    <td>${order.orderpay}</td>
+                    <td>${order.paystatus}</td>
+                    <td>${order.orderstatus}</td>
+                    <td>${order.nickname}</td>
+                    <td>${order.merchantname}</td>
+                    <td>${order.shopname}</td>
+                    <td class="action-column">
+                        <button class="view-details-btn" onclick="showOrderDetails('${order.orderid}')">查看更多信息</button>
+                    </td>
+                `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        }
+
+        // 显示订单详情弹窗
+        async function showOrderDetails(orderId) {
+            console.log('Fetching order details for order ID:', orderId);
+            const modal = document.getElementById('order-details-modal');
+            const orderDetailsTable = document.getElementById('order-details-table');
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5001/get_order_details/${orderId}`, {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const order = data.order;
+
+                // 清空表格内容
+                orderDetailsTable.innerHTML = '';
+
+                // 构建订单详细信息的表格内容
+                const tableRows = [
+                    ['订单号', order.orderid],
+                    ['商品名称', order.productname],
+                    ['单价', order.price],
+                    ['数量', order.quantity],
+                    ['总价', order.orderpay],
+                    ['支付方式', order.paymethod],
+                    ['支付时间', order.paytime],
+                    ['支付状态', order.paystatus],
+                    ['订单状态', order.orderstatus],
+                    ['收货地址', order.address],
+                    ['消费者ID', order.consumerid],
+                    ['消费者昵称', order.nickname],
+                    ['商家ID', order.merchantid],
+                    ['商家姓名', order.merchantname],
+                    ['店铺名称', order.shopname]
+                ];
+
+                tableRows.forEach(([key, value]) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+            <td style="text-align: right; padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>${key}:</strong></td>
+            <td style="text-align: left; padding: 8px; border: 1px solid #ddd; width: 70%;">${value}</td>
+        `;
+                    orderDetailsTable.appendChild(row);
+                });
+
+                // 显示模态框
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching order details:', error);
+                // 可以在这里添加错误处理逻辑，例如显示错误信息给用户
+            }
+        }
+
+        // 关闭订单详情弹窗
+        function closeOrderDetailsModal() {
+            const modal = document.getElementById('order-details-modal');
+            modal.style.display = 'none';
+        }
+
+        // 搜索订单信息
+        async function searchOrders() {
+            const searchInput = document.getElementById('order-search').value;
+            try {
+                const response = await fetch(`http://127.0.0.1:5001/search_orders?paystatus=${searchInput}`, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    console.error(`HTTP error! status: ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                const tableBody = document.getElementById('order-table-body');
+                tableBody.innerHTML = '';
+
+                data.orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                <td>${order.orderid}</td>
+                <td>${order.productname}</td>
+                <td>${order.orderpay}</td>
+                <td>${order.paystatus}</td>
+                <td>${order.orderstatus}</td>
+                <td>${order.nickname}</td>
+                <td>${order.merchantname}</td>
+                <td>${order.shopname}</td>
+                <td class="action-column">
+                    <button class="view-details-btn" onclick="showOrderDetails('${order.orderid}')">查看更多信息</button>
+                </td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error searching orders:', error);
+            }
+        }
+
+        // 重置订单信息
+        function resetOrders() {
+            document.getElementById('order-search').value = '';
+            fetchManagerorders();
+        }
+
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            window.location.href = '../1.html';
+        }
+
+        // 页面加载完成后调用 fetchMerchantShops 函数
+        window.onload = function () {
+            showContent('merchant'); // 默认显示商家-店铺信息内容
+            fetchMerchantShops();
+        };
+
+    </script>
+
+
+</body>
+</html>

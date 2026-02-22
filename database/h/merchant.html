@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书店系统 - 管理员界面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .nav-bar {
+            background-color: #007AFF;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .logout-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        .content > div {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #007AFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #007AFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007AFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        /* 进货管理部分的样式 */
+        .purchase-container {
+            padding: 20px;
+            margin-top: 80px;
+        }
+
+        .book-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .book-item {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 280px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+
+        .book-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .book-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .book-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .low-stock {
+            color: #ff4d4d !important;
+            font-weight: bold;
+        }
+
+        .purchase-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .purchase-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .purchase-form button {
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .purchase-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .month-selector {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .month-selector select {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .statistics-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-register-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 新添加的类名，用于统一按钮样式 */
+        .product-actions-button {
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .product-actions-button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        .category-filter {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .statistics-container {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-table-container:nth-child(1) {
+            flex: 2;
+        }
+
+        /* 店铺销售额统计部分 */
+        .chart-table-container:nth-child(2) {
+            flex: 1;
+        }
+
+        .logistics-bin {
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 20px;
+        }
+
+        .logistics-bin:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+
+    </style>
+</head>
+<body>
+<nav class="nav-bar">
+    <div class="nav-container">
+        <a href="#" class="nav-brand">电商管理系统</a>
+        <div class="nav-links">
+            <a href="#" class="nav-link active" onclick="showContent('shop-register')">店铺注册</a>
+            <a href="#" class="nav-link" onclick="showContent('statistics')">销售统计</a>
+            <a href="#" class="nav-link" onclick="showContent('orders')">订单管理</a>
+            <a href="#" class="nav-link" onclick="showContent('products')">商品管理</a>
+            <!-- 改为按钮，点击后跳转到 logistics.html -->
+            <button class="logistics-bin" onclick="window.location.href='logistics.html'">物流信息</button>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+</nav>
+
+<div class="content">
+    <!-- 店铺注册 -->
+    <div id="shop-register-content">
+        <div class="shop-register-container">
+            <h1>店铺注册</h1>
+            <form class="shop-register-form" id="shopRegisterForm">
+                <div class="form-group">
+                    <label for="shopname">店铺名称</label>
+                    <input type="text" id="shopname" placeholder="请输入店铺名称">
+                </div>
+                <div class="form-group">
+                    <label for="merchantname">商家名称</label>
+                    <input type="text" id="merchantname" placeholder="请输入商家名称">
+                </div>
+                <div class="form-group">
+                    <label for="shopaddress">店铺地址</label>
+                    <input type="text" id="shopaddress" placeholder="请输入店铺地址">
+                </div>
+                <div class="form-group">
+                    <label for="licensenumber">营业执照编号</label>
+                    <input type="text" id="licensenumber" placeholder="请输入营业执照编号">
+                </div>
+                <div class="form-group">
+                    <label for="idcard">身份证号</label>
+                    <input type="text" id="idcard" placeholder="请输入身份证号">
+                </div>
+                <div class="form-group">
+                    <label for="shoptype">店铺类型</label>
+                    <select id="shoptype">
+                        <option value="个人店铺">个人店铺</option>
+                        <option value="企业店铺">企业店铺</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="button" onclick="registerShop()">注册店铺</button>
+                </div>
+            </form>
+            <h2>已注册店铺</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>店铺名称</th>
+                    <th>店铺地址</th>
+                    <th>营业执照编号</th>
+                    <th>身份证号</th>
+                    <th>店铺类型</th>
+                </tr>
+                </thead>
+                <tbody id="shop-register-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 销售统计 -->
+    <div id="statistics-content">
+        <h2>销售统计</h2>
+        <div class="statistics-container">
+            <!-- 商品销量统计部分 -->
+            <div class="chart-table-container">
+                <h3>商品销量统计</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>商品号</th>
+                        <th>商品名</th>
+                        <th>商品类别</th>
+                        <th>销量</th>
+                        <th>单价</th>
+                        <th>店铺号</th>
+                        <th>店铺名</th>
+                    </tr>
+                    </thead>
+                    <tbody id="product-sales-table-body"></tbody>
+                </table>
+                <div class="pagination" id="product-sales-pagination"></div>
+                <canvas id="productSalesChart" width="400" height="200"></canvas>
+            </div>
+            <!-- 店铺销售额统计部分 -->
+            <div class="chart-table-container">
+                <h3>店铺销售额统计</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>店铺号</th>
+                        <th>店铺名</th>
+                        <th>总销售额</th>
+                        <th>商家名</th>
+                    </tr>
+                    </thead>
+                    <tbody id="shop-sales-table-body"></tbody>
+                </table>
+                <div class="pagination" id="shop-sales-pagination"></div>
+                <canvas id="shopSalesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 订单管理 -->
+    <div id="orders-content">
+        <h2>订单管理</h2>
+        <div id="orders-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>消费者id</th>
+                    <th>昵称</th>
+                    <th>支付时间</th>
+                    <th>商品名称</th>
+                    <th>单价 (元)</th>
+                    <th>数量</th>
+                    <th>总价 (元)</th>
+                    <th>支付方式</th>
+                    <th>支付状态</th>
+                    <th>订单状态</th>
+                    <th>收货地址</th>
+                </tr>
+                </thead>
+                <tbody id="orders-table-body"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="orders-pagination"></div>
+    </div>
+
+    <!-- 商品管理 -->
+    <div id="products-content">
+        <h1>商品管理</h1>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="searchProduct" placeholder="搜索商品名称" class="search-input">
+            <button onclick="searchProducts()" class="search-button">搜索</button>
+            <select id="categoryFilter" onchange="filterProducts()" class="category-filter">
+                <option value="">全部</option>
+                <option value="宠物用品">宠物用品</option>
+                <option value="生活用品">生活用品</option>
+                <option value="厨房用品">厨房用品</option>
+                <option value="美妆产品">美妆产品</option>
+                <option value="服装配饰">服装配饰</option>
+                <option value="电子产品">电子产品</option>
+                <option value="个人护理">个人护理</option>
+                <option value="运动器材">运动器材</option>
+            </select>
+        </div>
+        <div id="add-product-form" style="display:none;">
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="shopname">店铺名称</label>
+                    <input type="text" id="name" placeholder="请输入店铺名称">
+                </div>
+                <div class="form-group">
+                    <label for="productname">商品名称</label>
+                    <input type="text" id="productname" placeholder="请输入商品名称">
+                </div>
+                <div class="form-group">
+                    <label for="category">商品类别</label>
+                    <select id="category">
+                        <option value="宠物用品">宠物用品</option>
+                        <option value="生活用品">生活用品</option>
+                        <option value="厨房用品">厨房用品</option>
+                        <option value="美妆产品">美妆产品</option>
+                        <option value="服装配饰">服装配饰</option>
+                        <option value="电子产品">电子产品</option>
+                        <option value="个人护理">个人护理</option>
+                        <option value="运动器材">运动器材</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="price">商品单价</label>
+                    <input type="number" id="price" placeholder="请输入商品单价">
+                </div>
+                <div class="form-group">
+                    <label for="status">商品状态</label>
+                    <select id="status">
+                        <option value="有库存">有库存</option>
+                        <option value="缺货">缺货</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="button" onclick="addProduct()">提交</button>
+                </div>
+            </form>
+        </div>
+        <div id="products-table">
+            <table>
+                <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>商品ID</th>
+                    <th>商品名称</th>
+                    <th>商品类别</th>
+                    <th>销量</th>
+                    <th>商品单价</th>
+                    <th>商品状态</th>
+                    <th>店铺名</th>
+                </tr>
+                </thead>
+                <tbody id="products-table-body">
+                <tr>
+                    <td><input type="checkbox" data-productid="{{ product.productid }}"></td>
+                    <td>{{ product.productid }}</td>
+                    <td>{{ product.productname }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.salenumber }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.status }}</td>
+                    <td>{{ product.shopname }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button onclick="showEditProductForm()" class="product-actions-button" style="margin-right: 10px;">编辑商品
+            </button>
+            <button onclick="showAddProductForm()" class="product-actions-button" style="margin-right: 10px;">添加商品
+            </button>
+            <button onclick="deleteSelectedProducts()" class="product-actions-button">删除选中商品</button>
+        </div>
+        <div class="pagination" id="products-pagination"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let allProducts = []; // 新增全局变量存储所有商品数据
+    document.addEventListener('DOMContentLoaded', function () {
+        const phone = localStorage.getItem('phone');
+        const merchantname = localStorage.getItem('merchantname');
+        if (phone && merchantname) {
+            document.getElementById('merchantname').value = merchantname;
+            // 这里可以根据需求是否隐藏 merchantname 输入框
+            // document.getElementById('merchantname').style.display = 'none';
+        }
+        showContent('shop-register');
+    });
+
+    // 页面内容切换
+    function showContent(page) {
+        const contents = document.querySelectorAll('.content > div');
+        const links = document.querySelectorAll('.nav-link');
+
+        contents.forEach(content => content.style.display = 'none');
+        links.forEach(link => link.classList.remove('active'));
+
+        document.getElementById(`${page}-content`).style.display = 'block';
+        document.querySelector(`.nav-link[onclick="showContent('${page}')"]`).classList.add('active');
+
+        // 加载对应页面的数据
+        switch (page) {
+            case'shop-register'://店铺注册界面
+                fetchMerchantShops();
+                break;
+            case'statistics':
+                fetchStatistics();//销售统计界面
+                break;
+            case 'orders':
+                fetchOrders();//订单管理界面
+                break;
+            case'products':
+                fetchMerchantProducts();
+                break;
+        }
+    }
+
+    //店铺注册
+    async function registerShop() {
+        const shopname = document.getElementById('shopname').value;
+        const merchantname = document.getElementById('merchantname').value;
+        const shopaddress = document.getElementById('shopaddress').value;
+        const licensenumber = document.getElementById('licensenumber').value;
+        const idcard = document.getElementById('idcard').value;
+        const shoptype = document.getElementById('shoptype').value;
+
+        if (!idcard) {
+            alert('身份证号必须输入');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5001/register_shop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'shopname': shopname,
+                    'merchantname': merchantname,
+                    'shopaddress': shopaddress,
+                    'licensenumber': licensenumber,
+                    'idcard': idcard,
+                    'shoptype': shoptype
+                })
+            });
+
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                if (response.status === 400) {
+                    alert("注册信息有误，请检查输入");
+                } else if (response.status === 500) {
+                    alert("服务器内部错误，请稍后重试");
+                } else {
+                    alert("注册失败，请检查网络或联系管理员");
+                }
+                return;
+            }
+
+            const data = await response.json();
+            alert(data.message);
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("注册出现错误，请稍后重试");
+        }
+    }
+
+    //获取已注册的店铺
+    async function fetchMerchantShops() {
+        const phone = localStorage.getItem('phone');
+        try {
+            const response = await fetch(`http://127.0.0.1:5001/get_merchant_shops?phone=${phone}`, {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const shopTableBody = document.getElementById('shop-register-table-body');
+            shopTableBody.innerHTML = '';
+            data.shops.forEach(shop => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${shop.shopname}</td>
+                <td>${shop.shopaddress}</td>
+                <td>${shop.licensenumber}</td>
+                <td>${shop.idcard}</td>
+                <td>${shop.shoptype}</td>
+            `;
+                shopTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    }
+
+    // 销售统计
+    // 商品销量统计分页
+    let currentProductSalesPage = 1;
+    const productSalesPerPage = 5;
+
+    // 店铺销售额统计分页
+    let currentShopSalesPage = 1;
+    const shopSalesPerPage = 5;
+
+    async function fetchStatistics() {
+        const phone = localStorage.getItem('phone');
+        try {
+            const response = await fetch(`http://127.0.0.1:5001/statistics?phone=${phone}`, {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            // 商品销量统计分页
+            const productSalesStartIndex = (currentProductSalesPage - 1) * productSalesPerPage;
+            const productSalesEndIndex = productSalesStartIndex + productSalesPerPage;
+            const productSalesData = data.product_sales.slice(productSalesStartIndex, productSalesEndIndex);
+
+            // 渲染商品销量表格
+            const productSalesTableBody = document.getElementById('product-sales-table-body');
+            productSalesTableBody.innerHTML = '';
+            productSalesData.forEach(sale => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+        <td>${sale.productid}</td>
+        <td>${sale.productname}</td>
+        <td>${sale.category}</td>
+        <td>${sale.salenumber}</td>
+        <td>${sale.price}</td>
+        <td>${sale.shopid}</td>
+        <td>${sale.shopname}</td>
+    `;
+                productSalesTableBody.appendChild(row);
+            });
+
+            // 生成商品销量条形图
+            const productSalesChartCanvas = document.getElementById('productSalesChart');
+            const productSalesChartCtx = productSalesChartCanvas.getContext('2d');
+            const productSalesLabels = productSalesData.map(sale => sale.productname);
+            const productSalesDataValues = productSalesData.map(sale => sale.salenumber);
+            new Chart(productSalesChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: productSalesLabels,
+                    datasets: [{
+                        label: '商品销量',
+                        data: productSalesDataValues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 渲染商品销量分页按钮
+            renderProductSalesPagination(data.product_sales.length);
+
+            // 店铺销售额统计分页
+            const shopSalesStartIndex = (currentShopSalesPage - 1) * shopSalesPerPage;
+            const shopSalesEndIndex = shopSalesStartIndex + shopSalesPerPage;
+            const shopSalesData = data.shop_sales.slice(shopSalesStartIndex, shopSalesEndIndex);
+
+            // 渲染店铺销售额表格
+            const shopSalesTableBody = document.getElementById('shop-sales-table-body');
+            shopSalesTableBody.innerHTML = '';
+            shopSalesData.forEach(sale => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+        <td>${sale.shopid}</td>
+        <td>${sale.shopname}</td>
+        <td>${sale.sales}</td>
+        <td>${sale.merchantname}</td>
+    `;
+                shopSalesTableBody.appendChild(row);
+            });
+
+            // 生成店铺销售额饼状图
+            const shopSalesChartCanvas = document.getElementById('shopSalesChart');
+            const shopSalesChartCtx = shopSalesChartCanvas.getContext('2d');
+            const shopSalesLabels = shopSalesData.map(sale => sale.shopname);
+            const shopSalesDataValues = shopSalesData.map(sale => sale.sales);
+            new Chart(shopSalesChartCtx, {
+                type: 'pie',
+                data: {
+                    labels: shopSalesLabels,
+                    datasets: [{
+                        label: '店铺销售额',
+                        data: shopSalesDataValues,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                }
+            });
+
+            // 渲染店铺销售额分页按钮
+            renderShopSalesPagination(data.shop_sales.length);
+
+            function renderProductSalesPagination(totalItems) {
+                const productSalesPagination = document.getElementById('product-sales-pagination');
+                productSalesPagination.innerHTML = '';
+                const pageCount = Math.ceil(totalItems / productSalesPerPage);
+
+                // 上一页按钮
+                const prevButton = document.createElement('button');
+                prevButton.textContent = '上一页';
+                prevButton.disabled = currentProductSalesPage === 1;
+                prevButton.onclick = () => {
+                    if (currentProductSalesPage > 1) {
+                        currentProductSalesPage--;
+                        fetchStatistics();
+                    }
+                };
+                productSalesPagination.appendChild(prevButton);
+
+                // 页码按钮
+                for (let i = 1; i <= pageCount; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.className = i === currentProductSalesPage ? 'active' : '';
+                    button.onclick = () => {
+                        currentProductSalesPage = i;
+                        fetchStatistics();
+                    };
+                    productSalesPagination.appendChild(button);
+                }
+
+                // 下一页按钮
+                const nextButton = document.createElement('button');
+                nextButton.textContent = '下一页';
+                nextButton.disabled = currentProductSalesPage === pageCount || pageCount === 0;
+                nextButton.onclick = () => {
+                    if (currentProductSalesPage < pageCount) {
+                        currentProductSalesPage++;
+                        fetchStatistics();
+                    }
+                };
+                productSalesPagination.appendChild(nextButton);
+            }
+
+            function renderShopSalesPagination(totalItems) {
+                const shopSalesPagination = document.getElementById('shop-sales-pagination');
+                shopSalesPagination.innerHTML = '';
+                const pageCount = Math.ceil(totalItems / shopSalesPerPage);
+
+                // 上一页按钮
+                const prevButton = document.createElement('button');
+                prevButton.textContent = '上一页';
+                prevButton.disabled = currentShopSalesPage === 1;
+                prevButton.onclick = () => {
+                    if (currentShopSalesPage > 1) {
+                        currentShopSalesPage--;
+                        fetchStatistics();
+                    }
+                };
+                shopSalesPagination.appendChild(prevButton);
+
+                // 页码按钮
+                for (let i = 1; i <= pageCount; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.className = i === currentShopSalesPage ? 'active' : '';
+                    button.onclick = () => {
+                        currentShopSalesPage = i;
+                        fetchStatistics();
+                    };
+                    shopSalesPagination.appendChild(button);
+                }
+
+                // 下一页按钮
+                const nextButton = document.createElement('button');
+                nextButton.textContent = '下一页';
+                nextButton.disabled = currentShopSalesPage === pageCount || pageCount === 0;
+                nextButton.onclick = () => {
+                    if (currentShopSalesPage < pageCount) {
+                        currentShopSalesPage++;
+                        fetchStatistics();
+                    }
+                };
+                shopSalesPagination.appendChild(nextButton);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    }
+
+    // 订单管理
+    let currentOrdersPage = 1;
+    const ordersPerPage = 5;
+
+    async function fetchOrders() {
+        const phone = localStorage.getItem('phone');
+        try {
+            const response = await fetch(`http://127.0.0.1:5001/get_merchant_orders?phone=${phone}`, {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                return;
+            }
+            const data = await response.json();
+            const startIndex = (currentOrdersPage - 1) * ordersPerPage;
+            const endIndex = startIndex + ordersPerPage;
+            const ordersData = data.orders.slice(startIndex, endIndex);
+            const tableBody = document.getElementById('orders-table-body');
+            tableBody.innerHTML = '';
+
+            ordersData.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+        <td>${order.orderid}</td>
+        <td>${order.customerid}</td>
+        <td>${order.nickname}</td>
+        <td>${order.paytime}</td>
+        <td>${order.productname}</td>
+        <td>${order.price}</td>
+        <td>${order.quantity}</td>
+        <td>${order.orderpay}</td>
+        <td>${order.paymethod}</td>
+        <td>${order.paystatus}</td>
+        <td>${order.orderstatus}</td>
+        <td>${order.address}</td>
+    `;
+                tableBody.appendChild(row);
+            });
+
+            function renderOrdersPagination(totalItems) {
+                const paginationElement = document.getElementById('orders-pagination');
+                paginationElement.innerHTML = '';
+                const pageCount = Math.ceil(totalItems / ordersPerPage);
+
+                // 上一页按钮
+                const prevButton = document.createElement('button');
+                prevButton.textContent = '上一页';
+                prevButton.disabled = currentOrdersPage === 1;
+                prevButton.onclick = () => {
+                    if (currentOrdersPage > 1) {
+                        currentOrdersPage--;
+                        fetchOrders();
+                    }
+                };
+                paginationElement.appendChild(prevButton);
+
+                // 页码按钮
+                for (let i = 1; i <= pageCount; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.className = i === currentOrdersPage ? 'active' : '';
+                    button.onclick = () => {
+                        currentOrdersPage = i;
+                        fetchOrders();
+                    };
+                    paginationElement.appendChild(button);
+                }
+
+                // 下一页按钮
+                const nextButton = document.createElement('button');
+                nextButton.textContent = '下一页';
+                nextButton.disabled = currentOrdersPage === pageCount || pageCount === 0;
+                nextButton.onclick = () => {
+                    if (currentOrdersPage < pageCount) {
+                        currentOrdersPage++;
+                        fetchOrders();
+                    }
+                };
+                paginationElement.appendChild(nextButton);
+            }
+
+            // 渲染订单管理分页按钮
+            renderOrdersPagination(data.orders.length);
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    }
+
+    // 商品管理
+    let currentReturnsPage = 1;
+    const returnsPerPage = 5;
+
+    // 显示添加商品表单
+    function showAddProductForm() {
+        document.getElementById('add-product-form').style.display = 'block';
+    }
+
+    async function addProduct() {
+        const productname = document.getElementById('productname').value;
+        const category = document.getElementById('category').value;
+        const price = document.getElementById('price').value;
+        const shopname = document.getElementById('name').value;
+        const status = document.getElementById('status').value;
+
+        if (!productname || !category || !price || !shopname) {
+            alert('商品名称、商品类别、商品单价和店铺名称是必填项');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5001/add_product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'productname': productname,
+                    'category': category,
+                    'price': price,
+                    'shopname': shopname,
+                    'status': status
+                })
+            });
+
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                if (response.status === 400) {
+                    alert("添加商品信息有误，请检查输入");
+                } else if (response.status === 500) {
+                    alert("服务器内部错误，请稍后重试");
+                } else {
+                    alert("添加商品失败，请检查网络或联系管理员");
+                }
+                return;
+            }
+
+            const data = await response.json();
+            alert(data.message);
+
+            // 检查服务器是否返回了商品 id
+            if (data.productId) {
+                // 获取商品列表表格主体
+                const tableBody = document.getElementById('products-table-body');
+                // 创建新行
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                <td><input type="checkbox" data-productid="${data.productId}"></td>
+                <td>${data.productId}</td>
+                <td>${productname}</td>
+                <td>${category}</td>
+                <td>0</td>
+                <td>${price}</td>
+                <td>${status}</td>
+                <td>${shopname}</td>
+            `;
+                // 在表格开头插入新行
+                tableBody.insertBefore(newRow, tableBody.firstChild);
+            } else {
+                console.error("服务器未返回商品 id");
+            }
+
+            document.getElementById('add-product-form').style.display = 'none';
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("添加商品出现错误，请稍后重试");
+        }
+    }
+
+    //删除商品
+    function deleteSelectedProducts() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        const productIds = [];
+        checkboxes.forEach(checkbox => {
+            if (checkbox !== document.getElementById('selectAll')) {
+                productIds.push(checkbox.dataset.productid);
+            }
+        });
+
+        if (productIds.length === 0) {
+            alert('请选择要删除的商品');
+            return;
+        }
+
+        if (confirm('确定要删除选中的商品吗？')) {
+            (async () => {
+                try {
+                    const response = await fetch('http://127.0.0.1:5001/delete_products', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            'productIds': productIds
+                        })
+                    });
+
+                    if (!response.ok) {
+                        console.error(`HTTP error! status: ${response.status}`);
+                        if (response.status === 400) {
+                            alert("删除商品信息有误，请检查输入");
+                        } else if (response.status === 500) {
+                            alert("服务器内部错误，请稍后重试");
+                        } else {
+                            alert("删除商品失败，请检查网络或联系管理员");
+                        }
+                        return;
+                    }
+
+                    const data = await response.json();
+                    alert(data.message);
+                    await fetchMerchantProducts();// 重新获取商品数据
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    alert("删除商品出现错误，请稍后重试");
+                }
+            })();
+        }
+    }
+
+    // 显示编辑商品信息表单
+    function showEditProductForm() {
+        const selectedRow = document.querySelector('input[type="checkbox"]:checked');
+        if (!selectedRow) {
+            alert('请选择要编辑的商品');
+            return;
+        }
+        const productId = selectedRow.dataset.productid;
+        const product = allProducts.find(p => p.productid === productId); // 使用 allProducts 查找商品
+        if (product) {
+            const row = selectedRow.closest('tr');
+            const cells = row.querySelectorAll('td');
+            cells[3].innerHTML = `<select data-field="category">
+                                <option value="宠物用品" ${product.category === '宠物用品' ? 'selected' : ''}>宠物用品</option>
+                                <option value="生活用品" ${product.category === '生活用品' ? 'selected' : ''}>生活用品</option>
+                                <option value="厨房用品" ${product.category === '厨房用品' ? 'selected' : ''}>厨房用品</option>
+                                <option value="美妆产品" ${product.category === '美妆产品' ? 'selected' : ''}>美妆产品</option>
+                                <option value="服装配饰" ${product.category === '服装配饰' ? 'selected' : ''}>服装配饰</option>
+                                <option value="电子产品" ${product.category === '电子产品' ? 'selected' : ''}>电子产品</option>
+                                <option value="个人护理" ${product.category === '个人护理' ? 'selected' : ''}>个人护理</option>
+                                <option value="运动器材" ${product.category === '运动器材' ? 'selected' : ''}>运动器材</option>
+                            </select>`;
+            cells[5].innerHTML = `<input type="number" value="${product.price}" data-field="price">`;
+            cells[6].innerHTML = `<select data-field="status">
+                                <option value="有库存" ${product.status === '有库存' ? 'selected' : ''}>有库存</option>
+                                <option value="缺货" ${product.status === '缺货' ? 'selected' : ''}>缺货</option>
+                            </select>`;
+            cells[7].innerHTML = '<button class="save-btn" data-productid="' + productId + '">保存</button>';
+            const saveButton = row.querySelector('.save-btn');
+            saveButton.addEventListener('click', editProduct);
+        }
+    }
+
+    async function editProduct() {
+        const saveButton = event.target;
+        const productId = saveButton.dataset.productid;
+        const row = saveButton.closest('tr');
+        const cells = row.querySelectorAll('td');
+        const category = cells[3].querySelector('select[data-field="category"]').value;
+        const price = cells[5].querySelector('input[data-field="price"]').value;
+        const status = cells[6].querySelector('select[data-field="status"]').value;
+
+        try {
+            const response = await fetch('http://127.0.0.1:5001/edit_product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'productId': productId,
+                    'category': category,
+                    'price': price,
+                    'status': status
+                })
+            });
+
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                if (response.status === 400) {
+                    alert("编辑商品信息有误，请检查输入");
+                } else if (response.status === 500) {
+                    alert("服务器内部错误，请稍后重试");
+                } else {
+                    alert("编辑商品失败，请检查网络或联系管理员");
+                }
+                return;
+            }
+
+            const data = await response.json();
+            alert(data.message);
+            await fetchMerchantProducts();
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("编辑商品出现错误，请稍后重试");
+        }
+    }
+
+    // 搜索商品
+    function searchProducts() {
+        const searchText = document.getElementById('searchProduct').value.toLowerCase();
+        const rows = document.querySelectorAll('#products-table-body tr');
+        rows.forEach(row => {
+            const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            if (productName.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // 筛选商品
+    function filterProducts() {
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const rows = document.querySelectorAll('#products-table-body tr');
+        rows.forEach(row => {
+            const category = row.querySelector('td:nth-child(4)').textContent;
+            if (categoryFilter === '' || category === categoryFilter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    //商品管理
+    async function fetchMerchantProducts() {
+        const phone = localStorage.getItem('phone');
+        try {
+            const response = await fetch(`http://127.0.0.1:5001/get_merchant_products?phone=${phone}`, {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            allProducts = data.products;
+            const startIndex = (currentReturnsPage - 1) * returnsPerPage;
+            const endIndex = startIndex + returnsPerPage;
+            const productsData = data.products.slice(startIndex, endIndex);
+
+            MerchantProductsTable(productsData);
+            MerchantProductsPagination(data.products.length);
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    }
+
+    function MerchantProductsPagination(totalItems) {
+        const paginationElement = document.getElementById('products-pagination');
+        paginationElement.innerHTML = '';
+        const pageCount = Math.ceil(totalItems / returnsPerPage);
+
+        // 上一页按钮
+        const prevButton = document.createElement('button');
+        prevButton.textContent = '上一页';
+        prevButton.disabled = currentReturnsPage === 1;
+        prevButton.onclick = () => {
+            if (currentReturnsPage > 1) {
+                currentReturnsPage--;
+                fetchMerchantProducts();
+            }
+        };
+        paginationElement.appendChild(prevButton);
+
+        // 页码按钮
+        for (let i = 1; i <= pageCount; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.className = i === currentReturnsPage ? 'active' : '';
+            button.onclick = () => {
+                currentReturnsPage = i;
+                fetchMerchantProducts();
+            };
+            paginationElement.appendChild(button);
+        }
+        ;
+
+        // 下一页按钮
+        const nextButton = document.createElement('button');
+        nextButton.textContent = '下一页';
+        nextButton.disabled = currentReturnsPage === pageCount || pageCount === 0;
+        nextButton.onclick = () => {
+            if (currentReturnsPage < pageCount) {
+                currentReturnsPage++;
+                fetchMerchantProducts();
+            }
+        };
+        paginationElement.appendChild(nextButton);
+    }
+
+    function MerchantProductsTable(productsData) {
+        const tableBody = document.getElementById('products-table-body');
+        tableBody.innerHTML = '';
+        productsData.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+        <td><input type="checkbox" data-productid="${product.productid}"></td>
+        <td>${product.productid}</td>
+        <td>${product.productname}</td>
+        <td>${product.category}</td>
+        <td>${product.salenumber}</td>
+        <td>${product.price}</td>
+        <td>${product.status}</td>
+        <td>${product.shopname}</td>
+    `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // 全选功能
+    document.getElementById('selectAll').addEventListener('click', function () {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#selectAll)');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    function logout() {
+        window.location.href = '../1.html';
+    }
+
+</script>
+</body>
+</html>

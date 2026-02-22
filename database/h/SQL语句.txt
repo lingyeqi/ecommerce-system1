@@ -1,0 +1,158 @@
+--登录信息的视图（用来判断能否登录）
+CREATE VIEW login AS
+SELECT phonenumber, password, 'customer' AS role FROM customer
+UNION ALL
+SELECT phone, password, 'merchant' AS role FROM merchant
+
+
+--新建订单-商品视图
+CREATE VIEW order_product_view AS
+SELECT
+    o.orderid,
+    o.customerid,
+    c.nickname,           -- customer 表中的 nickname
+    o.address,
+    o.paytime,
+    p.productname,
+    p.price,
+    o.quantity,
+    o.orderpay,
+    o.paymethod,
+    o.paystatus,
+    o.orderstatus,
+    p.shopid,             -- product 表中的 shopid
+    s.shopname,           -- shop 表中的 shopname
+    s.merchantid,         -- shop 表中的 merchantid
+    m.name AS merchant_name -- merchant 表中的 name
+FROM
+    order1 o
+JOIN
+    product p ON o.productid = p.productid
+LEFT JOIN
+    customer c ON o.customerid = c.customerid
+LEFT JOIN
+    shop s ON p.shopid = s.shopid
+LEFT JOIN
+    merchant m ON s.merchantid = m.merchantid;
+
+--新建商品销量视图
+create view product_salenumber as
+select productid,productname,category,salenumber,price,product.shopid,shop.shopname
+from product,shop
+where product.shopid = shop.shopid
+
+--新建订单状态视图
+CREATE VIEW combined_order_view AS
+SELECT
+    l.tracknumber,
+    l.companyname,
+    l.telephone,
+    l.orderid,
+    o.orderstatus
+FROM
+    logistics l
+JOIN
+    order1 o ON l.orderid = o.orderid;
+
+-- 创建商家-店铺信息视图
+CREATE VIEW MerchantShopView AS
+SELECT TOP 100 PERCENT
+    m.merchantid,
+    m.name,
+    m.phone,
+    m.email,
+    s.shopid,
+    s.shopname,
+    s.shopaddress,
+    s.licensenumber,
+    s.idcard,
+    s.shoptype,
+    s.sales
+FROM
+    merchant m
+JOIN
+    shop s ON m.merchantid = s.merchantid
+ORDER BY
+    m.merchantid;
+
+-- 创建触发器 trg_order1_refund（退款触发器）
+CREATE TRIGGER trg_order1_refund
+ON order1
+AFTER UPDATE
+AS
+BEGIN
+    IF UPDATE(paystatus)
+    BEGIN
+        -- 声明变量存储订单信息
+        DECLARE @orderid nvarchar(50);
+        DECLARE @productid nvarchar(50);
+        DECLARE @quantity INT;
+        DECLARE @shopid nvarchar(50);
+        DECLARE @orderpay float;
+
+        -- 获取更新后的数据
+        SELECT @orderid = i.orderid, @productid = i.productid, @quantity = i.quantity, @orderpay = i.orderpay
+        FROM inserted i;
+
+        -- 仅当 paystatus 更新为 '已退款' 时执行操作
+        IF EXISTS (
+            SELECT 1
+            FROM inserted i
+            JOIN deleted d ON i.orderid = d.orderid
+            WHERE i.paystatus = '已退款' AND d.paystatus!= '已退款'
+        )
+        BEGIN
+            -- 减少 product 表中的销量
+            UPDATE product
+            SET salenumber = salenumber - @quantity
+            WHERE productid = @productid;
+
+            -- 获取店铺 ID
+            SELECT @shopid = shopid
+            FROM product
+            WHERE productid = @productid;
+
+            -- 减少店铺销售额
+            UPDATE shop
+            SET sales = sales - @orderpay
+            WHERE shopid = @shopid;
+
+            -- 将 order1 表中的 orderpay 置为 0
+            UPDATE order1
+            SET orderpay = 0
+            WHERE orderid = @orderid;
+        END
+    END
+END;
+
+
+--更新店铺销售额的触发器
+CREATE TRIGGER update_shop_sales
+ON order1
+AFTER INSERT
+AS
+BEGIN
+    -- 更新 shop 表中的 sales 字段，将新订单的销售额累加到原有的销售额上
+    UPDATE shop
+    SET sales = shop.sales + subquery.new_sales
+    FROM shop
+    JOIN (
+        SELECT p.shopid, SUM(o.orderpay) AS new_sales
+        FROM inserted o
+        JOIN product p ON p.productid = o.productid
+        GROUP BY p.shopid
+    ) subquery ON shop.shopid = subquery.shopid;
+END;
+
+--建立销量更新的触发器
+CREATE TRIGGER update_salenumber_trigger
+ON order1
+AFTER INSERT
+AS
+BEGIN
+    -- 更新 product 表的 salenumber 字段
+    UPDATE p
+    SET salenumber = p.salenumber + i.quantity
+    FROM product p
+    JOIN inserted i ON p.productid = i.productid;
+END;
